@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,12 +17,26 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SignupActivity extends AppCompatActivity {
 
     private static final String TAG = "SignupActivity";
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
+
 
     EditText _nameText3;
     EditText _addressText3;
@@ -42,6 +57,7 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
+        mAuth = FirebaseAuth.getInstance();
 
         _nameText3 = (EditText)findViewById(R.id.input_name3);
         _addressText3 = (EditText)findViewById(R.id.input_address3);
@@ -54,6 +70,20 @@ public class SignupActivity extends AppCompatActivity {
         _signupButton3 = (Button)findViewById(R.id.btn_signup3);
         _loginLink3 = (TextView)findViewById(R.id.link_login3);
         _switch3 = (Switch)findViewById(R.id.switch3);
+
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                if(user != null){
+                    Intent intent = new Intent(SignupActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
+            }
+        };
 
         _signupButton3.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,15 +141,16 @@ public class SignupActivity extends AppCompatActivity {
             }
         };
 
+
     }
 
     public void signup() {
         Log.d(TAG, "Signup");
 
-        if (!validate()) {
+       /* if (!validate()) {
             onSignupFailed();
             return;
-        }
+        }*/
 
         _signupButton3.setEnabled(false);
 
@@ -129,27 +160,54 @@ public class SignupActivity extends AppCompatActivity {
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
 
-       /* String name = _nameText3.getText().toString();
-        String address = _addressText3.getText().toString();
+        final String name = _nameText3.getText().toString();
+        final String address = _addressText3.getText().toString();
         String email = _emailText3.getText().toString();
-        String mobile = _mobileText3.getText().toString();
+        final String mobile = _mobileText3.getText().toString();
+        final String bloodGroup = _bloodGroup3.getText().toString();
+        final String lastDonated = _lastDonated3.getText().toString();
         String password = _passwordText3.getText().toString();
         String reEnterPassword = _reEnterPasswordText3.getText().toString();
-        */
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
                         onSignupSuccess();
                         progressDialog.dismiss();
+                        startActivity(new Intent(SignupActivity.this, ProfileActivity.class));
                     }
                 }, 3000);
+
+        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(SignupActivity.this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(!task.isSuccessful()){
+                    Toast.makeText(SignupActivity.this, "SignIn error" + task.getException(), Toast.LENGTH_SHORT).show();
+                }else {
+
+                    /*startActivity(new Intent(SignupActivity.this, ProfileActivity.class));
+                    finish();*/
+                    String user_id = mAuth.getCurrentUser().getUid();
+                    DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
+
+                    Map newPost = new HashMap();
+                    newPost.put("name", name);
+                    newPost.put("address", address);
+                    newPost.put("mobile", mobile);
+                    newPost.put("bloodgroup", bloodGroup);
+                    newPost.put("lastdonated", lastDonated);
+
+                    current_user_db.setValue(newPost);
+                }
+            }
+        });
     }
 
 
     public void onSignupSuccess() {
         _signupButton3.setEnabled(true);
         setResult(RESULT_OK, null);
+
         finish();
     }
 
@@ -208,7 +266,7 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         if (lastDonated.isEmpty()) {
-            _bloodGroup3.setError("Enter Valid Blood Group(O+,O-,A+,A-,B+,B-,AB+,AB-)");
+            _bloodGroup3.setError("Please select date");
             valid = false;
         } else {
             _bloodGroup3.setError(null);

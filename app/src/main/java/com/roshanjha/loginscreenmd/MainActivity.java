@@ -2,6 +2,7 @@ package com.roshanjha.loginscreenmd;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,25 +13,34 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
 
     EditText _emailText;
     EditText _passwordText;
     Button _loginButton;
     TextView _signupLink;
-
-
     Switch _switch1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mAuth = FirebaseAuth.getInstance();
+
 
         _emailText = (EditText) findViewById(R.id.input_email);
         _passwordText = (EditText) findViewById(R.id.input_password);
@@ -65,6 +75,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(user != null){
+                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
+            }
+        };
     }
 
     public void login() {
@@ -84,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.show();
 
         String email = _emailText.getText().toString();
-        String password = _passwordText.getText().toString();
+        final String password = _passwordText.getText().toString();
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
@@ -93,6 +116,23 @@ public class MainActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                     }
                 }, 3000);
+
+        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(!task.isSuccessful()){
+                    if (password.length() < 6) {
+                        _passwordText.setError("Enter valid password");
+                    } else {
+                        Toast.makeText(MainActivity.this, "Login failed", Toast.LENGTH_LONG).show();
+                    }
+                }else {
+                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
     }
 
 
@@ -142,5 +182,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(firebaseAuthListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAuth.removeAuthStateListener(firebaseAuthListener);
     }
 }
