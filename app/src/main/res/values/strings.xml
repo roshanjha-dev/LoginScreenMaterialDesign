@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Login Screen MD</string>
+
+    <array name="bloodGroup">
+        <item>O+ve</item>
+        <item>O-ve</item>
+        <item>A+ve</item>
+        <item>A-ve</item>
+        <item>B+ve</item>
+        <item>B-ve</item>
+        <item>AB+ve</item>
+        <item>AB-ve</item>
+    </array>
 </resources>

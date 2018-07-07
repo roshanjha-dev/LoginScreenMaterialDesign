@@ -2,6 +2,7 @@ package com.roshanjha.loginscreenmd;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,12 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,10 +33,30 @@ public class EmpLoginActivity extends AppCompatActivity {
     TextView _signupLink2;
     Switch _switch2;
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emp_login);
+
+        mAuth = FirebaseAuth.getInstance();
+       /* if(mAuth.getCurrentUser() != null){
+            finish();
+            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+        }*/
+
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(user != null){
+                    finish();
+                    startActivity(new Intent(EmpLoginActivity.this, HospitalProfileActivity.class));
+                }
+            }
+        };
 
         _emailText2 = (EditText)findViewById(R.id.input_email2);
         _passwordText2 = (EditText)findViewById(R.id.input_password2);
@@ -67,34 +94,41 @@ public class EmpLoginActivity extends AppCompatActivity {
     }
 
     public void login() {
-        Log.d(TAG, "Login");
 
         if (!validate()) {
-            onLoginFailed();
+            Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+            _loginButton2.setEnabled(true);
             return;
         }
-
         _loginButton2.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(EmpLoginActivity.this,
-                R.style.AppTheme_Dark_Dialog);
+        final ProgressDialog progressDialog = new ProgressDialog(EmpLoginActivity.this, R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
-        /*String email = _emailText2.getText().toString();
-        String password = _passwordText2.getText().toString();
-        */
+        String email = _emailText2.getText().toString().trim();
+        String password = _passwordText2.getText().toString().trim();
+
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
-
                         onLoginSuccess();
-
                         progressDialog.dismiss();
                     }
                 }, 3000);
+
+        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(EmpLoginActivity.this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    finish();
+                    startActivity(new Intent(EmpLoginActivity.this, ProfileActivity.class));
+
+                }
+            }
+        });
     }
 
 
@@ -117,26 +151,20 @@ public class EmpLoginActivity extends AppCompatActivity {
         finish();
     }
 
-    public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-
-        _loginButton2.setEnabled(true);
-    }
-
     public boolean validate() {
         boolean valid = true;
 
         String email = _emailText2.getText().toString();
         String password = _passwordText2.getText().toString();
 
-        if (email.isEmpty()) {
-            _emailText2.setError("enter a valid Hospital name");
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _emailText2.setError("enter a valid email");
             valid = false;
         } else {
             _emailText2.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
+        if (password.isEmpty() || password.length() < 4) {
             _passwordText2.setError("between 4 and 10 alphanumeric characters");
             valid = false;
         } else {

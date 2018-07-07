@@ -4,26 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity"
-    android:fitsSystemWindows="true">
+    tools:context=".HospitalProfileActivity">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:layout_width="110sp"
-            android:layout_height="110sp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/donor"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <Button
-                android:id="@+id/editUserDetails"
+                android:id="@+id/HeditDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Edit"
@@ -41,20 +33,22 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Name:"
+                android:text="Hospital Name:"
                 android:textSize="20sp"
                 android:textColor="#bebaba"
                 android:layout_weight="1"
                 android:layout_marginLeft="25sp"
                 />
+
             <TextView
-                android:id="@+id/displayName"
+                android:id="@+id/HdisplayName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20sp"
                 android:text="Display Name"
-                android:textSize="18sp"
-                android:layout_weight="1"/>
+                android:textSize="20sp"
+                android:layout_weight="1"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -67,20 +61,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Address:"
+                android:text="Location:"
                 android:textSize="20sp"
                 android:textColor="#bebaba"
                 android:layout_weight="1"
                 android:layout_marginLeft="25sp"
                 />
             <TextView
-                android:id="@+id/displayAddress"
+                android:id="@+id/HdisplayAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20sp"
-                android:text="Display Address"
-                android:textSize="18sp"
                 android:layout_weight="1"
+                android:text="Display Address"
+                android:textSize="20sp"
+
                 />
         </LinearLayout>
 
@@ -94,19 +89,47 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Email:"
+                android:text="Mail Id:"
                 android:textSize="20sp"
                 android:textColor="#bebaba"
                 android:layout_weight="1"
                 android:layout_marginLeft="25sp"
                 />
-            <TextView
-                android:id="@+id/displayEmail"
+
+                <TextView
+                android:id="@+id/HdisplayEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20sp"
                 android:text="Display Email"
-                android:textSize="18sp"
+                android:textSize="20sp"
+                android:layout_weight="1"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:layout_gravity="center_horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contact No:"
+                android:textSize="20sp"
+                android:textColor="#bebaba"
+                android:layout_weight="1"
+                android:layout_marginLeft="25sp"
+                />
+            <TextView
+                android:id="@+id/HdisplayMobile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20sp"
+                android:text="Display Number"
+                android:textSize="20sp"
                 android:layout_weight="1"/>
         </LinearLayout>
 
@@ -120,81 +143,31 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mobile No:"
+                android:text="Avg Blood Reqd per month:"
                 android:textSize="20sp"
                 android:textColor="#bebaba"
                 android:layout_weight="1"
                 android:layout_marginLeft="25sp"
                 />
+
             <TextView
-                android:id="@+id/displayMobile"
+                android:id="@+id/HdisplayAvgBldReqd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20sp"
-                android:text="Display Mobile"
-                android:textSize="18sp"
+                android:text="Display AvgBloodReqd"
+                android:textSize="20sp"
                 android:layout_weight="1"/>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:layout_gravity="center_horizontal"
-            android:weightSum="2">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Blood Group:"
-                android:textSize="20sp"
-                android:textColor="#bebaba"
-                android:layout_weight="1"
-                android:layout_marginLeft="25sp"
-                />
-            <TextView
-                android:id="@+id/displayBldGrp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20sp"
-                android:text="Display BloodGroup"
-                android:textSize="18sp"
-                android:layout_weight="1"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:layout_gravity="center_horizontal"
-            android:weightSum="2">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Date of last Donated:"
-                android:textSize="20sp"
-                android:textColor="#bebaba"
-                android:layout_weight="1"
-                android:layout_marginLeft="25sp"
-                />
-            <TextView
-                android:id="@+id/displayLastDonated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20sp"
-                android:text="Display LastDonated"
-                android:textSize="18sp"
-                android:layout_weight="1"
-                />
-        </LinearLayout>
         <Button
-            android:id="@+id/_signOut"
+            android:id="@+id/_HsignOut"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sign Out"
             android:layout_marginBottom="20sp"
             android:layout_gravity="center_horizontal"/>
     </LinearLayout>
+
 </ScrollView>

@@ -31,6 +31,7 @@ public class EmpSignupActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
+    private DatabaseReference databaseReference;
 
     EditText _nameText4;
     EditText _addressText4;
@@ -49,8 +50,9 @@ public class EmpSignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_emp_signup);
 
         mAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
-        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+        /*firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -62,7 +64,12 @@ public class EmpSignupActivity extends AppCompatActivity {
                     return;
                 }
             }
-        };
+        };*/
+
+        if(mAuth.getCurrentUser() != null){
+            finish();
+            startActivity(new Intent(EmpSignupActivity.this, HospitalProfileActivity.class));
+        }
 
         _nameText4 = (EditText)findViewById(R.id.input_name4);
         _addressText4 = (EditText)findViewById(R.id.input_address4);
@@ -106,14 +113,14 @@ public class EmpSignupActivity extends AppCompatActivity {
         Log.d(TAG, "Signup");
 
         if (!validate()) {
-            onSignupFailed();
+            Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+            _signupButton4.setEnabled(true);
             return;
         }
 
         _signupButton4.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(EmpSignupActivity.this,
-                R.style.AppTheme_Dark_Dialog);
+        final ProgressDialog progressDialog = new ProgressDialog(EmpSignupActivity.this, R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
@@ -132,7 +139,6 @@ public class EmpSignupActivity extends AppCompatActivity {
                     public void run() {
                         onSignupSuccess();
                         progressDialog.dismiss();
-                        startActivity(new Intent(EmpSignupActivity.this, ProfileActivity.class));
                     }
                 }, 3000);
 
@@ -140,12 +146,20 @@ public class EmpSignupActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(!task.isSuccessful()){
-                    Toast.makeText(EmpSignupActivity.this, "SignIn error" + task.getException(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EmpSignupActivity.this, "Registration error" + task.getException(), Toast.LENGTH_SHORT).show();
                 }else {
 
-                    /*startActivity(new Intent(EmpSignupActivity.this, ProfileActivity.class));
-                    finish();*/
-                    String user_id = mAuth.getCurrentUser().getUid();
+                    sendEmailVerification();
+                    HospitalUserInformation hospitalUserInformation = new HospitalUserInformation(name, address, email, mobile, avgBloodReqd);
+
+                    FirebaseUser user = mAuth.getCurrentUser();
+
+                    databaseReference.child(user.getUid()).setValue(hospitalUserInformation);
+
+                    finish();
+                    startActivity(new Intent(EmpSignupActivity.this, HospitalProfileActivity.class));
+
+                    /*String user_id = mAuth.getCurrentUser().getUid();
                     DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
 
                     Map newPost = new HashMap();
@@ -155,10 +169,25 @@ public class EmpSignupActivity extends AppCompatActivity {
                     newPost.put("phone", mobile);
                     newPost.put("avgBloodReqd", avgBloodReqd);
 
-                    current_user_db.setValue(newPost);
+                    current_user_db.setValue(newPost);*/
                 }
             }
         });
+    }
+
+    private void sendEmailVerification() {
+        FirebaseUser user2 = FirebaseAuth.getInstance().getCurrentUser();
+        if(user2!=null){
+            user2.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Toast.makeText(EmpSignupActivity.this, "Check the email for Verification", Toast.LENGTH_SHORT).show();
+                        FirebaseAuth.getInstance().signOut();
+                    }
+                }
+            });
+        }
     }
 
 
@@ -166,12 +195,6 @@ public class EmpSignupActivity extends AppCompatActivity {
         _signupButton4.setEnabled(true);
         setResult(RESULT_OK, null);
         finish();
-    }
-
-    public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-
-        _signupButton4.setEnabled(true);
     }
 
     public boolean validate() {
@@ -213,14 +236,14 @@ public class EmpSignupActivity extends AppCompatActivity {
             _mobileText4.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
+        if (password.isEmpty() || password.length() < 4) {
             _passwordText4.setError("between 4 and 10 alphanumeric characters");
             valid = false;
         } else {
             _passwordText4.setError(null);
         }
 
-        if (reEnterPassword.isEmpty() || reEnterPassword.length() < 4 || reEnterPassword.length() > 10 || !(reEnterPassword.equals(password))) {
+        if (reEnterPassword.isEmpty() || reEnterPassword.length() < 4 || !(reEnterPassword.equals(password))) {
             _reEnterPasswordText4.setError("Password Do not match");
             valid = false;
         } else {

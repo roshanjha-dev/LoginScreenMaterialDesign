@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                android:hint="Hospital name" />
+                android:hint="Hospital EmailId" />
         </android.support.design.widget.TextInputLayout>
 
         <!--  Password Label -->
