@@ -15,8 +15,9 @@
         <ImageView
             android:layout_width="110sp"
             android:layout_height="110sp"
+            android:layout_marginTop="20sp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/donor"/>
+            android:src="@drawable/donor1"/>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -1,6 +1,7 @@
 package com.roshanjha.loginscreenmd;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +29,10 @@ import java.util.Calendar;
 public class UpdateUserDetails extends AppCompatActivity {
 
     private static final String TAG = "UpdateUserDetails";
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
+    private DatabaseReference databaseReference;
 
     EditText _updateName;
     EditText _updateAddress;
@@ -41,6 +47,8 @@ public class UpdateUserDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_user_details);
+
+        mAuth = FirebaseAuth.getInstance();
 
         _updateName = (EditText)findViewById(R.id.update_name);
         _updateAddress = (EditText)findViewById(R.id.update_address);
@@ -92,7 +100,6 @@ public class UpdateUserDetails extends AppCompatActivity {
                         _updateName.setText(userInformation.getUserName());
                         _updateAddress.setText(userInformation.getAddress());
                         _updateMobile.setText(userInformation.getMobile());
-
                         _updateLastDonated.setText(userInformation.getLastDonated());
                     }
 
@@ -112,9 +119,12 @@ public class UpdateUserDetails extends AppCompatActivity {
                 String lastDonated = _updateLastDonated.getText().toString();
 
                 UserInformation userInformation = new UserInformation(name, address, mobile, bloodGroup, lastDonated);
+                FirebaseUser user = mAuth.getCurrentUser();
 
-                databaseReference.setValue(userInformation);
+                databaseReference.child(user.getUid()).setValue(userInformation);
+
                 finish();
+                startActivity(new Intent(UpdateUserDetails.this, ProfileActivity.class));
             }
         });
 

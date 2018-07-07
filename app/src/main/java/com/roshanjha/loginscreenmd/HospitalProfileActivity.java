@@ -19,7 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class HospitalProfileActivity extends AppCompatActivity {
 
-    Button _signOut;
+    Button _HsignOut;
     Button _HeditDetails;
     TextView _HdisplayName;
     TextView _HdisplayAddress;
@@ -46,7 +46,7 @@ public class HospitalProfileActivity extends AppCompatActivity {
         _HdisplayMobile = (TextView)findViewById(R.id.HdisplayMobile);
         _HdisplayAvgBldReqd = (TextView)findViewById(R.id.HdisplayAvgBldReqd);
 
-        _signOut = (Button)findViewById(R.id._HsignOut);
+        _HsignOut = (Button)findViewById(R.id._HsignOut);
         _HeditDetails = (Button)findViewById(R.id.HeditDetails);
 
 
@@ -85,12 +85,19 @@ public class HospitalProfileActivity extends AppCompatActivity {
                     }
                 });
 
-        _signOut.setOnClickListener(new View.OnClickListener() {
+        _HsignOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mAuth.signOut();
                 finish();
                 startActivity(new Intent(HospitalProfileActivity.this, MainActivity.class));
+            }
+        });
+
+        _HeditDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(HospitalProfileActivity.this, HospitalUpdateDetails.class));
             }
         });
     }

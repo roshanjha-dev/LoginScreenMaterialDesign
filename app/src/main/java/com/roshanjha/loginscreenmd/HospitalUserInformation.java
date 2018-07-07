@@ -24,6 +24,14 @@ public class HospitalUserInformation extends AppCompatActivity {
         this.avgBloodReqd = avgBloodReqd;
     }
 
+    public HospitalUserInformation(String hospitalName, String address, String mobile, String avgBldReqd) {
+        this.hospitalName = hospitalName;
+        this.address = address;
+        this.mobile = mobile;
+        this.avgBloodReqd = avgBldReqd;
+
+    }
+
     public String getHospitalName() {
         return hospitalName;
     }

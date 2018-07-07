@@ -26,7 +26,8 @@
         <activity android:name=".ProfileActivity" />
         <activity android:name=".HospitalUserInformation" />
         <activity android:name=".HospitalProfileActivity" />
-        <activity android:name=".UpdateUserDetails"></activity>
+        <activity android:name=".UpdateUserDetails" />
+        <activity android:name=".HospitalUpdateDetails"></activity>
     </application>
 
 </manifest>
